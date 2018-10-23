@@ -1,23 +1,19 @@
 import json
-import requests
-from requests.auth import HTTPBasicAuth
+from RestManager import RestManager
 
 class AssetCurrencyManager:
 
 	refCurrency = "EUR"
-	currencies = ["EUR", "USD", "GBp", "JPY", "NOK", "SEK"]
+	currencies = ["EUR", "USD", "GBP", "JPY", "NOK", "SEK"]
 	changeRate = {}
 
 	def __init__(self):
-	
-		for cur in currencies:
-			req = requests.get('https://dolphin.jump-technology.com:3472/api/v1/currency/rate/' + refCurrency + '/to/' + cur, auth=HTTPBasicAuth('epita_user_7', 'td92D2UbcAyX2LZu'))
-			res = json.loads(req.content)
+		api = RestManager()
+		for cur in self.currencies:
+			response = api.get('currency/rate/' + self.refCurrency + '/to/' + cur)
+			res = json.loads(response)
 			self.changeRate[cur] = res['rate']['value']
+		print(self.changeRate)
 
-	def updateChangeRate():
 
-		for cur in currencies:
-			req = requests.get('https://dolphin.jump-technology.com:3472/api/v1/currency/rate/' + refCurrency + '/to/' + cur, auth=HTTPBasicAuth('epita_user_7', 'td92D2UbcAyX2LZu'))
-			res = json.loads(req.content)
-			self.changeRate[cur] = res['rate']['value']
+x = AssetCurrencyManager()
