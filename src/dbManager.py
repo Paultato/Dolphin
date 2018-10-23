@@ -3,7 +3,7 @@ from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('sqlite:///database.sqlite', echo=True)
+engine = create_engine('sqlite:///../database.sqlite', echo=True)
 connection = engine.connect()
 if not database_exists(engine.url):
     create_database(engine.url)
