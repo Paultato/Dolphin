@@ -10,9 +10,9 @@
 
 `virtualenv env`
 
-`pip install -r requirements.txt`
-
 `source env/bin/activate`
+
+`pip install -r requirements.txt`
 
 Pour ajouter des paquets pip au projet, installer avec pip (dans virtualenv) les paquets puis ajouter le paquet et sa version dans le fichier `requirements.txt`
 
@@ -26,7 +26,7 @@ Pour initialiser la base de données : `mysql -u root` `SOURCE init.sql;`
 
 ## Technologies utilisées
 
-* python 3
+* python3
 * pip
 * MySQL
 * peewee
