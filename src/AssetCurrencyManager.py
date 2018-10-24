@@ -14,6 +14,3 @@ class AssetCurrencyManager:
 			res = json.loads(response)
 			self.changeRate[cur] = res['rate']['value']
 		print(self.changeRate)
-
-
-x = AssetCurrencyManager()
