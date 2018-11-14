@@ -13,4 +13,3 @@ class AssetCurrencyManager:
 			response = api.get('currency/rate/' + self.refCurrency + '/to/' + cur)
 			res = json.loads(response)
 			self.changeRate[cur] = res['rate']['value']
-		print(self.changeRate)
