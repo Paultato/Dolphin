@@ -12,6 +12,6 @@ class RestManager:
 		response = requests.get(self.URI + self.basePath + path, auth=HTTPBasicAuth(self.username, self.pwd))
 		return response.content
 
-	def post(self, path):
-		response = requests.put(self.URI + self.basePath + path, auth=HTTPBasicAuth(self.username, self.pwd))
+	def post(self, path, body):
+		response = requests.put(self.URI + self.basePath + path, json=body, auth=HTTPBasicAuth(self.username, self.pwd))
 		return response.content
