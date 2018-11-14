@@ -1,25 +1,25 @@
-from sqlalchemy import create_engine, Column, Integer, String, Sequence, Numeric, Float, inspect
+from sqlalchemy import create_engine, Column, Integer, String, Sequence, Float, Numeric
 from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
-engine = create_engine('sqlite:///../database.sqlite', echo=True)
+ 
+engine = create_engine('sqlite:///database.sqlite', echo=True)
 connection = engine.connect()
 if not database_exists(engine.url):
     create_database(engine.url)
-print("Database Existing : ", database_exists(engine.url))
-
+print("Database Existing: ", database_exists(engine.url))
+ 
 Base = declarative_base()
-
+ 
 class Currency(Base):
     __tablename__ = 'currency'
 
     id = Column(Integer, Sequence('currency_id_seq'), primary_key=True)
     name = Column(String)
-    value = Column(Integer)
+    value = Column(Float)
 
     def __repr__(self):
-        return "<Currency(name='%s', value='%s')>" % (self.name, self.value)
+        return "<Currency(name='%s', value='%f')>" % (self.name, self.value)
 
 class Asset(Base):
     __tablename__ = 'asset'
@@ -31,14 +31,16 @@ class Asset(Base):
     sharpe = Column(Numeric(precision=15))
 
     def __repr__(self):
-        return "<Asset(REST ID='%s', Close Value='%s', Type='%s', Sharpe='%s')>" % (self.rest_id, self.close_value, self.asset_type, self.sharpe)
+        return "<Asset(REST ID='%d', Close Value='%f', Type='%s', Sharpe='%f')>" % (self.rest_id, self.close_value, self.asset_type, self.sharpe)
+ 
 
 Currency.__table__
 Asset.__table__
-Base.metadata.create_all(bind=engine)
-
-ins = inspect(engine)
-for _t in ins.get_table_names():
-    print(_t)
-
+Base.metadata.create_all(engine)
+ 
+Session = sessionmaker(bind=engine)
+Session.configure(bind=engine)
+session = Session()
+session.commit()
+ 
 connection.close()
