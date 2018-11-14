@@ -14,6 +14,12 @@ class dbManager:
         Session.configure(bind=engine)
         self.session = Session()
 
+    def getAssets(self):
+        return self.session.query(Asset)
+
+    def getCurrencies(self):
+        return self.session.query(Currency)
+
     def insertAsset(self, assetId, price, assetType, sharpe_ratio):
         asset = Asset(rest_id=assetId, close_value=price, asset_type=assetType, sharpe=sharpe_ratio)
         self.session.add(asset)

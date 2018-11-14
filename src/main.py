@@ -11,7 +11,5 @@ def main():
 		##compute sharpe
 
 
-
-
 if __name__ == "__main__":
 	main()

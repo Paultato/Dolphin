@@ -12,7 +12,6 @@ def getAssets():
 		assetId = int(asset["REST_OBJECT_ID"]["value"])
 		price = getPrice(asset["LAST_CLOSE_VALUE"]["value"])
 		sharpe = getSharpe(assetId)
-		# TODO: DB
 		db.insertAsset(assetId, price, asset["TYPE"]["value"], sharpe)
 
 
