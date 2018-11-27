@@ -4,7 +4,7 @@ from RestManager import RestManager
 class AssetCurrencyManager:
 
 	refCurrency = "EUR"
-	currencies = ["EUR", "USD", "GBP", "JPY", "NOK", "SEK"]
+	currencies = ["EUR", "USD", "GBP", "JPY", "NOK", "SEK", "DKK", "CHF"]
 	changeRate = {}
 
 	def __init__(self):
