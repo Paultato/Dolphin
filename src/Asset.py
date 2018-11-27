@@ -24,11 +24,9 @@ def getPrice(price_str):
 
 def getSharpe(assetId):
 	data = {"ratio": [20], "asset": [assetId]}
-	print(data)
 	api = RestManager()
 	response = api.post("ratio/invoke", data)
-	print(response)
 	res = json.loads(response)
-	return float(res[str(assetId)]["20"]["value"])
+	return float((res[str(assetId)]["20"]["value"]).replace(',', '.'))
 
 getAssets()
