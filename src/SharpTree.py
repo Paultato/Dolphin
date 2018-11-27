@@ -4,12 +4,13 @@ import json
 
 def createPath(node):
   path = collections.deque()
+  res = ""
   while node:
     path.append(node)
     node = node.parent
   while path:
-    print(json.loads(path.pop().value)['name'], end=' ')
-  print()
+    res += json.loads(path.pop().value)['name']
+  return ''.join(sorted(set(res.lower()))).strip()
 
 class Node:
   def __init__(self, value, parent=[], childrens=[]):
@@ -29,6 +30,7 @@ class Node:
   def breadthTraversal(self):
     q = collections.deque()
     visited = collections.deque()
+    pathList = list()
     q.append(self)
     q.append(None)
 
@@ -36,12 +38,12 @@ class Node:
     maxRow = 0
     while size:
       node = q.popleft()
-      createPath(node)
+      path = createPath(node)
       size -= 1
-      if node:
-        if not visited.count(node):
+      if node :
+        if not visited.count(node) and (path not in pathList) :
           visited.append(node)
-          print("node : " + str(node.value), "parent : " + str(node.parent), sep=' -  *  - ')
+          print("node : " + str(node.value), "parent : " + str(node.parent), "path : " + path, sep=' -  *  - ')
           i = 0
           while i < len(node.childrens):
             data = json.loads(node.childrens[i].value)['sharpe']
@@ -51,12 +53,13 @@ class Node:
           i = 0
           j = 0
           while i < len(node.childrens):
-            if json.loads(node.childrens[i].value)['sharpe'] >= maxRow / 2:
+            if json.loads(node.childrens[i].value)['sharpe'] >= maxRow / 1.5:
               node.childrens[i].setParent(node)
               q.append(node.childrens[i])
               j += 1
             i += 1
           size += j
+          pathList.append(path)
 
       else:
         print("—")
