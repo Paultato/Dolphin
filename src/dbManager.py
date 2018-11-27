@@ -22,18 +22,17 @@ class dbManager:
 
     def insertAsset(self, assetId, price, assetType, sharpe_ratio):
         asset = Asset(rest_id=assetId, close_value=price, asset_type=assetType, sharpe=sharpe_ratio)
-        self.session.add(asset)
-        assets = self.session.query(Asset).filter_by(rest_id=assetId)
-        for asset in assets:
-            print(asset)
+        exists = self.session.query(Asset).filter_by(rest_id=assetId).first() is not None
+        print(exists)
+        if not exists:
+            self.session.add(asset)
+        else:
+            print("Asset already in the database")
         self.session.commit()
 
     def insertCurrency(self, curName, curValue):
         currency = Currency(name=curName, value=curValue)
         self.session.add(currency)
-        currencies = self.session.query(Currency).filter_by(name=curName)
-        for currency in currencies:
-            print(currency)
         self.session.commit()
     
     def close(self):
