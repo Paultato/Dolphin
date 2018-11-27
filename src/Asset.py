@@ -19,7 +19,7 @@ def getAssets():
 
 def getPrice(price_str, changeRate, currency):
 	price_str = price_str.replace(',', '.')
-	price_str = price_str[0:len(price_str) - 2]
+	price_str = price_str.split(' ', 1)[0]
 	price = float(price_str)
 	print(float(changeRate[currency]))
 	print('price = ' + str(price))
