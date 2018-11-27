@@ -78,8 +78,10 @@ class Node:
 if __name__ == "__main__":
 
   db = dbManager()
-  res = db.getAssets()
-
+  query = db.getAssets()
+  print(query)
+  db.close()
+  
   root = Node(json.dumps({'name': "45", 'sharpe': 0.6}))
   n1 = Node(json.dumps({'name': "74", 'sharpe': 0.5}))
   n2 = Node(json.dumps({'name': "13", 'sharpe': 0.4}))
