@@ -16,15 +16,16 @@ def getAssets():
 
 
 def getPrice(price_str):
+	price_str = price_str.replace(',', '.')
 	price_str = price_str[0:len(price_str) - 2]
 	price = float(price_str)
 	# TODO: conversion rate
 	return price
 
 def getSharpe(assetId):
-	json={"ratio": [20], "asset": [assetId]}
+	data ={"ratio": [20], "asset": [assetId]}
 	api = RestManager()
-	response = api.post("ratio/invoke", json)
+	response = api.post("ratio/invoke", data)
 	res = json.loads(response)
 	return float(res[str(assetId)]["20"]["value"])
 
