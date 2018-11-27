@@ -1,16 +1,22 @@
 import collections
 import json
+from dbManager import *
 
 
 def createPath(node):
-  path = collections.deque()
+  path = list()
   res = ""
   while node:
-    path.append(node)
+    ##path.append("".join(sorted((json.loads(node.value)['name'].lower()))).strip())
+    path.append(json.loads(node.value)['name'].lower().strip())
     node = node.parent
+  path.sort()
+  path.reverse()
+  if path:
+    res = path.pop()
   while path:
-    res += json.loads(path.pop().value)['name']
-  return ''.join(sorted(set(res.lower()))).strip()
+    res += '-' + path.pop()
+  return res
 
 class Node:
   def __init__(self, value, parent=[], childrens=[]):
@@ -71,16 +77,19 @@ class Node:
       
 if __name__ == "__main__":
 
-  root = Node(json.dumps({'name': "A", 'sharpe': 0.6}))
-  n1 = Node(json.dumps({'name': "B", 'sharpe': 0.5}))
-  n2 = Node(json.dumps({'name': "C", 'sharpe': 0.4}))
-  n3 = Node(json.dumps({'name': "D", 'sharpe': 0.2}))
-  n4 = Node(json.dumps({'name': "C", 'sharpe': 0.7}))
-  n5 = Node(json.dumps({'name': "D", 'sharpe': 0.6}))
-  n6 = Node(json.dumps({'name': "B", 'sharpe': 0.5}))
-  n7 = Node(json.dumps({'name': "D", 'sharpe': 0.4}))
-  n8 = Node(json.dumps({'name': "B", 'sharpe': 0.1}))
-  n9 = Node(json.dumps({'name': "C", 'sharpe': 0.1}))
+  db = dbManager()
+  res = db.getAssets()
+
+  root = Node(json.dumps({'name': "45", 'sharpe': 0.6}))
+  n1 = Node(json.dumps({'name': "74", 'sharpe': 0.5}))
+  n2 = Node(json.dumps({'name': "13", 'sharpe': 0.4}))
+  n3 = Node(json.dumps({'name': "99", 'sharpe': 0.2}))
+  n4 = Node(json.dumps({'name': "13", 'sharpe': 0.7}))
+  n5 = Node(json.dumps({'name': "99", 'sharpe': 0.6}))
+  n6 = Node(json.dumps({'name': "74", 'sharpe': 0.5}))
+  n7 = Node(json.dumps({'name': "99", 'sharpe': 0.4}))
+  n8 = Node(json.dumps({'name': "74", 'sharpe': 0.1}))
+  n9 = Node(json.dumps({'name': "13", 'sharpe': 0.1}))
 
   root.setChildrens([n1, n2, n3])
   n1.setChildrens([n4, n5])
@@ -88,3 +97,5 @@ if __name__ == "__main__":
   n3.setChildrens([n8, n9])
 
   root.breadthTraversal()
+
+
