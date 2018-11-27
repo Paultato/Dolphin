@@ -26,12 +26,13 @@ class Asset(Base):
 
     id = Column(Integer, Sequence('asset_id_seq'), primary_key=True)
     rest_id = Column(Integer)
-    close_value = Column(Float)
+    close_value = Column(Integer)
+    close_value_decimal = Column(Numeric(precision=15))
     asset_type = Column(String)
     sharpe = Column(Numeric(precision=15))
 
     def __repr__(self):
-        return "<Asset(REST ID='%d', Close Value='%f', Type='%s', Sharpe='%f')>" % (self.rest_id, self.close_value, self.asset_type, self.sharpe)
+        return "<Asset(REST ID='%d', Close Value='%d', Close Value Decimal='%f', Type='%s', Sharpe='%f')>" % (self.rest_id, self.close_value, self.close_value_decimal, self.asset_type, self.sharpe)
  
 
 Currency.__table__

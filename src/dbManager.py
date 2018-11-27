@@ -20,8 +20,8 @@ class dbManager:
     def getCurrencies(self):
         return self.session.query(Currency)
 
-    def insertAsset(self, assetId, price, assetType, sharpe_ratio):
-        asset = Asset(rest_id=assetId, close_value=price, asset_type=assetType, sharpe=sharpe_ratio)
+    def insertAsset(self, assetId, price, price_decimal, assetType, sharpe_ratio):
+        asset = Asset(rest_id=assetId, close_value=price, close_value_decimal=price_decimal, asset_type=assetType, sharpe=sharpe_ratio)
         exists = self.session.query(Asset).filter_by(rest_id=assetId).first() is not None
         print(exists)
         if not exists:
