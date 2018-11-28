@@ -14,8 +14,9 @@ class PortfolioManager:
 			assetList.append({'asset': {'asset': pair[0], 'quantity': pair[1]}})
 		return {'currency': {'code': self.code}, 'label': self.label, 'type': self.typef, 'values': {self.date: assetList}}
 
-	def putPortfolio(self, body):
+	def putPortfolio(self, portfolio):
 		api = RestManager()
+		body = self.buildJson(portfolio)
 		api.put('portfolio/1034/dyn_amount_compo', body)
 
 class Portfolio:
