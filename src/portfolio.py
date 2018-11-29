@@ -2,6 +2,7 @@ import json
 import Asset
 from dbManager import dbManager
 from RestManager import RestManager
+from correlation import CorrelationManager
 
 class Portfolio:
 	assets = []
@@ -34,13 +35,22 @@ class Portfolio:
 		return self.sharpe
 
 	def getCorrelation(self, asset):
+		cm = CorrelationManager()
+		cm.build_df()
 		tot = 0
 		for cur in self.assets:
-			#TODO
-			correl = getCorrel(asset, cur)
-			tot += correl
+			correl = cm.value(asset, cur[0])
+			tot += float(correl.replace(',', '.'))
 		return tot / len(self.assets)
-		
+
+	def addAsset(self, asset, quantity):
+		self.assets.append((asset, quantity, Asset.getAssetValue(asset))) 
+
+	def dump(self):
+		for pair in self.assets:
+			print(pair[0], ' : ', pair[1], ' -> ', pair[1] * pair[2])
+
+'''
 	def getNAV(self):
 		total = 0
 		more = []
@@ -53,17 +63,11 @@ class Portfolio:
 			value = asset[1] * asset[2]
 			if (value > sup)
 				more.append((asset[0], asset[1], value-sup))
-
-
-	def addAsset(self, asset, quantity):
-		self.assets.append((asset, quantity, Asset.getAssetValue(asset))) 
-
-	def dump(self):
-		for pair in self.assets:
-			print(pair[0], ' : ', pair[1], ' -> ', pair[1] * pair[2])
-
-
+'''
 
 pf = Portfolio()
 pf.addAsset(1001, 1)
+pf.addAsset(597, 2)
+pf.addAsset(598, 3)
+print(pf.getCorrelation(759))
 pf.dump()
