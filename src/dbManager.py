@@ -15,10 +15,7 @@ class dbManager:
         self.session = Session()
 
     def getAssets(self):
-        result = self.session.query(Asset)
-        for res in result :
-            print(res)
-        print(result)
+        result = self.session.query(Asset).all()
         return self.session.query(Asset).order_by(Asset.rest_id)
 
     def getCurrencies(self):
