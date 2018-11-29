@@ -1,14 +1,20 @@
 import collections
 import json
 from dbManager import *
+from sqlalchemy import desc
+from decimal import Decimal
+
+
 
 
 def createPath(node):
   path = list()
+  visited = list()
   res = ""
-  while node:
+  while node and not visited.count(node):
+    visited.append(node)
     ##path.append("".join(sorted((json.loads(node.value)['name'].lower()))).strip())
-    path.append(json.loads(node.value)['name'].lower().strip())
+    path.append((node.rest.id).lower().strip())
     node = node.parent
   path.sort()
   path.reverse()
@@ -18,20 +24,14 @@ def createPath(node):
     res += '-' + path.pop()
   return res
 
-class Node:
-  def __init__(self, value, parent=[], childrens=[]):
-    self.value = value
-    self.parent = parent
-    self.childrens = childrens
-
-  def setParent(self, parent):
-    self.parent = parent
-
-  def setChildrens(self, childrens):
-    self.childrens = childrens
-
-  def __str__(self):
-    return str(json.loads(self.value))
+class nodeAsset:
+  def __init__(self, restId, closeValue, type, sharpe):
+    self.restId = restId
+    self.closeValue = closeValue
+    self.type = type
+    self.sharpe = sharpe
+    self.parent = None
+    self.childrens = list()
 
   def breadthTraversal(self):
     q = collections.deque()
@@ -73,31 +73,55 @@ class Node:
         size += 1
         maxRow = 0
 
+  def prettyPrint(self):
+    createPath(self)
+    
+
+  def sharpeTree(self, assetList):
+    maxSharpe = Decimal(0.0)
+    for asset in assetList[:]:
+      maxSharpe = max(maxSharpe, asset.sharpe)
+      # Elagage maxSharpe
+      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.5)):
+        asset.parent = self
+        self.childrens.append(asset)
+        assetList.remove(asset)
+    for children in self.childrens:
+      children.sharpeTree(assetList)
+
 
       
 if __name__ == "__main__":
 
+  assetList = list()
   db = dbManager()
-  query = db.getAssets()
-  print(query)
+  query = db.getAssets().order_by(desc('sharpe')).all()
+  for asset in query:
+    tmp = nodeAsset(asset.rest_id, asset.close_value + (asset.close_value_decimal / 1000000000000) - 1,
+                asset.asset_type, asset.sharpe)
+    assetList.append(tmp)
   db.close()
-  
-  root = Node(json.dumps({'name': "45", 'sharpe': 0.6}))
-  n1 = Node(json.dumps({'name': "74", 'sharpe': 0.5}))
-  n2 = Node(json.dumps({'name': "13", 'sharpe': 0.4}))
-  n3 = Node(json.dumps({'name': "99", 'sharpe': 0.2}))
-  n4 = Node(json.dumps({'name': "13", 'sharpe': 0.7}))
-  n5 = Node(json.dumps({'name': "99", 'sharpe': 0.6}))
-  n6 = Node(json.dumps({'name': "74", 'sharpe': 0.5}))
-  n7 = Node(json.dumps({'name': "99", 'sharpe': 0.4}))
-  n8 = Node(json.dumps({'name': "74", 'sharpe': 0.1}))
-  n9 = Node(json.dumps({'name': "13", 'sharpe': 0.1}))
+  print(assetList[0])
 
-  root.setChildrens([n1, n2, n3])
-  n1.setChildrens([n4, n5])
-  n2.setChildrens([n6, n7])
-  n3.setChildrens([n8, n9])
+  # root = Node(json.dumps({'name': "A", 'sharpe': 0.6}))
+  # n1 = Node(json.dumps({'name': "B", 'sharpe': 0.5}))
+  # n2 = Node(json.dumps({'name': "C", 'sharpe': 0.4}))
+  # n3 = Node(json.dumps({'name': "D", 'sharpe': 0.2}))
+  # n4 = Node(json.dumps({'name': "E", 'sharpe': 0.7}))
+  # n5 = Node(json.dumps({'name': "F", 'sharpe': 0.6}))
+  # n6 = Node(json.dumps({'name': "G", 'sharpe': 0.5}))
+  # n7 = Node(json.dumps({'name': "H", 'sharpe': 0.4}))
+  # n8 = Node(json.dumps({'name': "I", 'sharpe': 0.1}))
+  # n9 = Node(json.dumps({'name': "J", 'sharpe': 0.1}))
 
-  root.breadthTraversal()
+  # root.setChildrens([n1, n2, n3])
+  # n1.setChildrens([n4, n5])
+  # n2.setChildrens([n6, n7, n3, n8, root])
+  # n3.setChildrens([n8, n9, n2])
 
+  # root.breadthTraversal()
+  a = assetList.pop(0)
+  a.sharpeTree(assetList)
+  a.prettyPrint()
+  print(assetList)
 
