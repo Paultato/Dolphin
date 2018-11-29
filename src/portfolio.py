@@ -21,6 +21,7 @@ class PortfolioManager:
 
 class Portfolio:
 	assets = []
+	sharpe = 0
 
 	def addAsset(self, asset, quantity):
 		self.assets.append((asset, quantity)) 
