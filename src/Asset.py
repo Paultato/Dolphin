@@ -12,7 +12,7 @@ def getAssets():
 	acm = AssetCurrencyManager()
 
 	for asset in assets:
-		if (asset["TYPE"]["value"] == "PORTFOLIO"):
+		if (asset["TYPE"]["value"] == "PORTFOLIO" or asset["FIRST_QUOTE_DATE"]["value"] != "2012-01-02"):
 			continue
 		assetId = int(asset["REST_OBJECT_ID"]["value"])
 		price = getPrice(asset["LAST_CLOSE_VALUE"]["value"], acm.changeRate, asset["CURRENCY"]["value"])
