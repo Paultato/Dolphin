@@ -21,12 +21,15 @@ class Portfolio:
 		body = self.buildJson()
 		api.put('portfolio/1034/dyn_amount_compo', body)
 
-	def getSharpe(self):
+	def computeSharpe(self):
 		api = RestManager()
 		body = {"ratio": [20], "asset": [1034]}
 		response = api.post('ratio/invoke', body)
 		res = json.loads(response)
-		return res["1034"]["20"]["value"]
+		self.sarpe = res["1034"]["20"]["value"]
+
+	def getSharpe(self):
+		return self.sharpe
 
 	def addAsset(self, asset, quantity):
 		self.assets.append((asset, quantity)) 
