@@ -51,22 +51,62 @@ class Portfolio:
 			print(pair[0], ' : ', pair[1], ' -> ', pair[1] * pair[2])
 
 	def getNAV(self):
-			total = 0
-			more = []
-			less = []
-			for asset in self.assets:
-				total += asset[1] * asset[2]
-			for asset in self.assets:
-				sup = total / 10
-				und = total / 100
-				value = asset[1] * asset[2]
-				if (value > sup):
-					more.append((asset[0], asset[1], value/total))
-				if (value < und):
-					less.append((asset[0], asset[1], value/total))
-			return (more, less)
+		total = 0
+		more = []
+		less = []
+		for asset in self.assets:
+			total += asset[1] * asset[2]
+		for asset in self.assets:
+			sup = total / 10
+			und = total / 100
+			value = asset[1] * asset[2]
+			if (value > sup):
+				more.append((asset[0], asset[1], value/total))
+			if (value < und):
+				less.append((asset[0], asset[1], value/total))
+		return (more, less)
+
+	def decrement(self, asset):
+		for ass in self.assets:
+			if (ass[0] == asset):
+				self.assets.remove(ass)
+				self.assets.append((ass[0], ass[1] - 1, ass[2]))
+
+	def increment(self, asset):
+		for ass in self.assets:
+			if (ass[0] == asset):
+				self.assets.remove(ass)
+				self.assets.append((ass[0], ass[1] + 1, ass[2]))
+
+	def max(self, assetList):
+		max = 0
+		for asset in assetList:
+			if (asset[2] > max):
+				max = asset[2]
+		return max
+
+	def min(self, assetList):
+		min = 0
+		for asset in assetList:
+			if (asset[2] < min):
+				min = asset[2]
+		return min
+
+	def ponderate(self):
+		nav = self.getNAV()
+		more = nav[0]
+		less = nav[1]
+		while (len(more) > 0 and len(less) > 0):
+			self.decrement((self.max(more))[0])
+			self.increment((self.min(less))[0])
 
 pf = Portfolio()
 pf.addAsset(1001, 10)
-pf.addAsset(687, 1)
-print(pf.getNAV())
+pf.increment(1001)
+pf.dump()
+
+
+
+
+
+
