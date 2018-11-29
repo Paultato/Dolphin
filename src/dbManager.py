@@ -17,6 +17,9 @@ class dbManager:
     def getAssets(self):
         return self.session.query(Asset)
 
+    def getAsset(self, assetId):
+        return self.session.query(Asset).filter_by(rest_id=assetId).first()
+
     def getCurrencies(self):
         return self.session.query(Currency)
 

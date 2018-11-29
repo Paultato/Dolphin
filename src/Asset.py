@@ -39,4 +39,7 @@ def getSharpe(assetId):
 	res = json.loads(response)
 	return float((res[str(assetId)]["20"]["value"]).replace(',', '.'))
 
-getAssets()
+def getAssetValue(assetId):
+	db = dbManager()
+	ass = db.getAsset(assetId)
+	return ass.close_value + (ass.close_value_decimal / 1000000000000) - 1
