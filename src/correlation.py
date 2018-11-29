@@ -10,6 +10,7 @@ class CorrelationManager:
     api = RestManager()
     assets = []
     data = {}
+    dataframe = None
 
     def __init__(self):
         db_assets = self.db.getAssets()
@@ -39,9 +40,19 @@ class CorrelationManager:
             doc[ass] = self.data[ass]
         df = pandas.DataFrame(doc)
         print(df)
-        df.to_csv('corr.csv', sep=',', index=False, index_label=False)
+        df.to_csv('corr.csv', sep=',', index=False)
 
-    
+    def build_df(self):
+        df = pandas.read_csv('corr.csv', sep=',')
+        df.set_index('id', inplace=True)
+        self.dataframe = df
+
+    def value(self, i, j):
+        return self.dataframe[str(i)][j]
 
 cm = CorrelationManager()
 #cm.build_csv()
+#print(cm.dataframe)
+cm.build_df()
+print(cm.dataframe)
+print(cm.value(1001, 717))
