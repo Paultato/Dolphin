@@ -50,24 +50,23 @@ class Portfolio:
 		for pair in self.assets:
 			print(pair[0], ' : ', pair[1], ' -> ', pair[1] * pair[2])
 
-'''
 	def getNAV(self):
-		total = 0
-		more = []
-		less = []
-		for asset in assets:
-			total += asset[1] * asset[2]
-		for asset in assets:
-			sup = total / 10
-			und = total / 100
-			value = asset[1] * asset[2]
-			if (value > sup)
-				more.append((asset[0], asset[1], value-sup))
-'''
+			total = 0
+			more = []
+			less = []
+			for asset in self.assets:
+				total += asset[1] * asset[2]
+			for asset in self.assets:
+				sup = total / 10
+				und = total / 100
+				value = asset[1] * asset[2]
+				if (value > sup):
+					more.append((asset[0], asset[1], value/total))
+				if (value < und):
+					less.append((asset[0], asset[1], value/total))
+			return (more, less)
 
 pf = Portfolio()
-pf.addAsset(1001, 1)
-pf.addAsset(597, 2)
-pf.addAsset(598, 3)
-print(pf.getCorrelation(759))
-pf.dump()
+pf.addAsset(1001, 10)
+pf.addAsset(687, 1)
+print(pf.getNAV())
