@@ -5,8 +5,10 @@ from sqlalchemy import desc
 from decimal import Decimal
 
 
-def createPath(node):
+def createPath(node, oldPath):
   path = list()
+  if oldPath:
+    path = oldPath.split('-')
   visited = list()
   res = ""
   while node and not visited.count(node):
@@ -53,7 +55,7 @@ class nodeAsset:
       maxRow = 0
       while size:
           node = q.popleft()
-          path = createPath(node)
+          path = createPath(node, None)
           size -= 1
           if node:
               if not visited.count(node) and (path not in pathList):
@@ -84,12 +86,12 @@ class nodeAsset:
               maxRow = 0
 
   def prettyPrint(self):
-      createPath(self)
+      createPath(self, None)
 
-  def sharpeTree(self, assetList):
+  def sharpeTree(self, assetList, path, pathList):
     maxSharpe = Decimal(0.0)
     copySelf = self.deepCopy()
-    path = createPath(self)
+    path = createPath(self, None)
     tmp = list()
     for a in assetList:
       if not (a == self):
@@ -97,15 +99,26 @@ class nodeAsset:
     print("parent : " + str(copySelf.restId))
     for asset in tmp:
       maxSharpe = max(maxSharpe, asset.sharpe)
-      # Elagage maxSharpe
-      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.5)):
-        print("path : " + path + " | path asset : " + createPath(asset))
+      # Elagage sharpe
+      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.5)):   
         asset.parent = copySelf
-        copySelf.childrens.append(asset)
-    for items in copySelf.childrens:
-      print(items.restId)
+        # Elagage unicité
+        if (not pathList.count(createPath(asset, None))):
+          copySelf.childrens.append(asset)
+        else:
+          asset.parent = None
+          print("Elagage unicité")
+          continue
+      else:
+        print("Elagage sharpe")
+      # FixMe : Not sure if path is added after removed from unicity constrain
+      # Paths added and seem ok to me, need double check
+      if not copySelf.childrens:
+        print("path : " + path)
+        if not pathList.count(path):
+          pathList.append(path)
     for children in copySelf.childrens:
-      children.sharpeTree(tmp)
+      children.sharpeTree(tmp, path, pathList)
 
 
 if __name__ == "__main__":
@@ -118,7 +131,6 @@ if __name__ == "__main__":
                     asset.asset_type, asset.sharpe)
     assetList.append(tmp)
   db.close()
-  print(assetList[0])
 
   # root = Node(json.dumps({'name': "A", 'sharpe': 0.6}))
   # n1 = Node(json.dumps({'name': "B", 'sharpe': 0.5}))
@@ -137,7 +149,8 @@ if __name__ == "__main__":
   # n3.setChildrens([n8, n9, n2])
 
   # root.breadthTraversal()
+  pathList = list()
   a = assetList[0]
-  a.sharpeTree(assetList)
+  a.sharpeTree(assetList, "", pathList)
   # a.prettyPrint()
   print(assetList)
