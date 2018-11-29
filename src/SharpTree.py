@@ -5,16 +5,14 @@ from sqlalchemy import desc
 from decimal import Decimal
 
 
-
-
 def createPath(node):
   path = list()
   visited = list()
   res = ""
   while node and not visited.count(node):
     visited.append(node)
-    ##path.append("".join(sorted((json.loads(node.value)['name'].lower()))).strip())
-    path.append((node.rest.id).lower().strip())
+    # path.append("".join(sorted((json.loads(node.value)['name'].lower()))).strip())
+    path.append(str((node.restId)).lower().strip())
     node = node.parent
   path.sort()
   path.reverse()
@@ -23,6 +21,7 @@ def createPath(node):
   while path:
     res += '-' + path.pop()
   return res
+
 
 class nodeAsset:
   def __init__(self, restId, closeValue, type, sharpe):
@@ -33,72 +32,90 @@ class nodeAsset:
     self.parent = None
     self.childrens = list()
 
+  def deepCopy(self):
+    tmp = nodeAsset(0, 0, 0, 0)
+    tmp.restId = self.restId
+    tmp.closeValue = self.closeValue
+    tmp.type = self.type
+    tmp.sharpe = self.sharpe
+    tmp.parent = self.parent
+    tmp.childrens = list()
+    return tmp
+
   def breadthTraversal(self):
-    q = collections.deque()
-    visited = collections.deque()
-    pathList = list()
-    q.append(self)
-    q.append(None)
+      q = collections.deque()
+      visited = collections.deque()
+      pathList = list()
+      q.append(self)
+      q.append(None)
 
-    size = 1
-    maxRow = 0
-    while size:
-      node = q.popleft()
-      path = createPath(node)
-      size -= 1
-      if node :
-        if not visited.count(node) and (path not in pathList) :
-          visited.append(node)
-          print("node : " + str(node.value), "parent : " + str(node.parent), "path : " + path, sep=' -  *  - ')
-          i = 0
-          while i < len(node.childrens):
-            data = json.loads(node.childrens[i].value)['sharpe']
-            maxRow = max(maxRow, data)
-            i += 1
+      size = 1
+      maxRow = 0
+      while size:
+          node = q.popleft()
+          path = createPath(node)
+          size -= 1
+          if node:
+              if not visited.count(node) and (path not in pathList):
+                  visited.append(node)
+                  print("node : " + str(node.value), "parent : " +
+                        str(node.parent), "path : " + path, sep=' -  *  - ')
+                  i = 0
+                  while i < len(node.childrens):
+                      data = json.loads(node.childrens[i].value)['sharpe']
+                      maxRow = max(maxRow, data)
+                      i += 1
 
-          i = 0
-          j = 0
-          while i < len(node.childrens):
-            if json.loads(node.childrens[i].value)['sharpe'] >= maxRow / 1.5:
-              node.childrens[i].setParent(node)
-              q.append(node.childrens[i])
-              j += 1
-            i += 1
-          size += j
-          pathList.append(path)
+                  i = 0
+                  j = 0
+                  while i < len(node.childrens):
+                      if json.loads(node.childrens[i].value)['sharpe'] >= maxRow / 1.5:
+                          node.childrens[i].setParent(node)
+                          q.append(node.childrens[i])
+                          j += 1
+                      i += 1
+                  size += j
+                  pathList.append(path)
 
-      else:
-        print("—")
-        q.append(None)
-        size += 1
-        maxRow = 0
+          else:
+              print("—")
+              q.append(None)
+              size += 1
+              maxRow = 0
 
   def prettyPrint(self):
-    createPath(self)
-    
+      createPath(self)
 
   def sharpeTree(self, assetList):
     maxSharpe = Decimal(0.0)
-    for asset in assetList[:]:
+    copySelf = self.deepCopy()
+    path = createPath(self)
+    tmp = list()
+    for a in assetList:
+      if not (a == self):
+        tmp.append(a.deepCopy())
+    print("parent : " + str(copySelf.restId))
+    for asset in tmp:
       maxSharpe = max(maxSharpe, asset.sharpe)
       # Elagage maxSharpe
       if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.5)):
-        asset.parent = self
-        self.childrens.append(asset)
-        assetList.remove(asset)
-    for children in self.childrens:
-      children.sharpeTree(assetList)
+        print("path : " + path + " | path asset : " + createPath(asset))
+        asset.parent = copySelf
+        copySelf.childrens.append(asset)
+    for items in copySelf.childrens:
+      print(items.restId)
+    for children in copySelf.childrens:
+      children.sharpeTree(tmp)
 
 
-      
 if __name__ == "__main__":
 
   assetList = list()
   db = dbManager()
-  query = db.getAssets().order_by(desc('sharpe')).all()
+  query = db.getAssets().order_by(desc('sharpe')).limit(10).all()
   for asset in query:
     tmp = nodeAsset(asset.rest_id, asset.close_value + (asset.close_value_decimal / 1000000000000) - 1,
-                asset.asset_type, asset.sharpe)
+                    asset.asset_type, asset.sharpe)
     assetList.append(tmp)
   db.close()
   print(assetList[0])
@@ -120,8 +137,7 @@ if __name__ == "__main__":
   # n3.setChildrens([n8, n9, n2])
 
   # root.breadthTraversal()
-  a = assetList.pop(0)
+  a = assetList[0]
   a.sharpeTree(assetList)
-  a.prettyPrint()
+  # a.prettyPrint()
   print(assetList)
-
