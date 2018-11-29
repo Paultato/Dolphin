@@ -37,5 +37,3 @@ class Portfolio:
 	def dump(self):
 		for pair in self.assets:
 			print(pair[0], ' : ', pair[1])
-
-
