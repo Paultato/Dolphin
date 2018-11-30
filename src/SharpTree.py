@@ -55,16 +55,15 @@ class nodeAsset:
     for a in assetList:
       if not (a == self):
         tmp.append(a.deepCopy())
-    print("parent : " + str(copySelf.restId))
     for asset in tmp:
       maxSharpe = max(maxSharpe, asset.sharpe)
       # Elagage sharpe
-      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.5)):   
+      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.2)):   
         asset.parent = copySelf
         # Elagage unicité
         if (not pathList.count(createPath(asset, None))):
           copySelf.childrens.append(asset)
-          if (path.count('-') + 1 >= 20) and (not pathList.count(path)):
+          if (path.count('-') + 1 == 20) and (not pathList.count(path)):
             pathList.append(path)
         else:
           asset.parent = None
@@ -72,44 +71,26 @@ class nodeAsset:
           continue
       else:
         print("Elagage sharpe")
-      # FixMe : Not sure if path is added after removed from unicity constrain
-      # Paths added and seem ok to me, need double check
       if not copySelf.childrens:
         print("path : " + path)
-        if (path.count('-') + 1 >= 20) and (not pathList.count(path)):
+        if (path.count('-') + 1 == 20) and (not pathList.count(path)):
           pathList.append(path)
     for children in copySelf.childrens:
-      children.sharpeTree(tmp, path, pathList)
+      if (path.count('-') + 1 < 20):
+        children.sharpeTree(tmp, path, pathList)
 
 
 if __name__ == "__main__":
 
   assetList = list()
   db = dbManager()
-  query = db.getAssets().order_by(desc('sharpe')).limit(10).all()
+  query = db.getAssets().order_by(desc('sharpe')).limit(30).all()
   for asset in query:
     tmp = nodeAsset(asset.rest_id, asset.close_value + (asset.close_value_decimal / 1000000000000) - 1,
                     asset.asset_type, asset.sharpe)
     assetList.append(tmp)
   db.close()
 
-  # root = Node(json.dumps({'name': "A", 'sharpe': 0.6}))
-  # n1 = Node(json.dumps({'name': "B", 'sharpe': 0.5}))
-  # n2 = Node(json.dumps({'name': "C", 'sharpe': 0.4}))
-  # n3 = Node(json.dumps({'name': "D", 'sharpe': 0.2}))
-  # n4 = Node(json.dumps({'name': "E", 'sharpe': 0.7}))
-  # n5 = Node(json.dumps({'name': "F", 'sharpe': 0.6}))
-  # n6 = Node(json.dumps({'name': "G", 'sharpe': 0.5}))
-  # n7 = Node(json.dumps({'name': "H", 'sharpe': 0.4}))
-  # n8 = Node(json.dumps({'name': "I", 'sharpe': 0.1}))
-  # n9 = Node(json.dumps({'name': "J", 'sharpe': 0.1}))
-
-  # root.setChildrens([n1, n2, n3])
-  # n1.setChildrens([n4, n5])
-  # n2.setChildrens([n6, n7, n3, n8, root])
-  # n3.setChildrens([n8, n9, n2])
-
-  # root.breadthTraversal()
   pathList = list()
   a = assetList[0]
   a.sharpeTree(assetList, "", pathList)
