@@ -44,47 +44,6 @@ class nodeAsset:
     tmp.childrens = list()
     return tmp
 
-  def breadthTraversal(self):
-      q = collections.deque()
-      visited = collections.deque()
-      pathList = list()
-      q.append(self)
-      q.append(None)
-
-      size = 1
-      maxRow = 0
-      while size:
-          node = q.popleft()
-          path = createPath(node, None)
-          size -= 1
-          if node:
-              if not visited.count(node) and (path not in pathList):
-                  visited.append(node)
-                  print("node : " + str(node.value), "parent : " +
-                        str(node.parent), "path : " + path, sep=' -  *  - ')
-                  i = 0
-                  while i < len(node.childrens):
-                      data = json.loads(node.childrens[i].value)['sharpe']
-                      maxRow = max(maxRow, data)
-                      i += 1
-
-                  i = 0
-                  j = 0
-                  while i < len(node.childrens):
-                      if json.loads(node.childrens[i].value)['sharpe'] >= maxRow / 1.5:
-                          node.childrens[i].setParent(node)
-                          q.append(node.childrens[i])
-                          j += 1
-                      i += 1
-                  size += j
-                  pathList.append(path)
-
-          else:
-              print("—")
-              q.append(None)
-              size += 1
-              maxRow = 0
-
   def prettyPrint(self):
       createPath(self, None)
 
@@ -105,6 +64,8 @@ class nodeAsset:
         # Elagage unicité
         if (not pathList.count(createPath(asset, None))):
           copySelf.childrens.append(asset)
+          if (path.count('-') + 1 >= 20) and (not pathList.count(path)):
+            pathList.append(path)
         else:
           asset.parent = None
           print("Elagage unicité")
@@ -115,7 +76,7 @@ class nodeAsset:
       # Paths added and seem ok to me, need double check
       if not copySelf.childrens:
         print("path : " + path)
-        if not pathList.count(path):
+        if (path.count('-') + 1 >= 20) and (not pathList.count(path)):
           pathList.append(path)
     for children in copySelf.childrens:
       children.sharpeTree(tmp, path, pathList)
@@ -152,5 +113,5 @@ if __name__ == "__main__":
   pathList = list()
   a = assetList[0]
   a.sharpeTree(assetList, "", pathList)
-  # a.prettyPrint()
-  print(assetList)
+  for p in pathList:
+    print(p)
