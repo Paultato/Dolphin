@@ -57,8 +57,8 @@ class Portfolio:
 		for asset in self.assets:
 			total += asset[1] * asset[2]
 		for asset in self.assets:
-			sup = total / 2
-			und = total / 20
+			sup = total / 10
+			und = total / 100
 			value = asset[1] * asset[2]
 			if (value > sup):
 				more.append((asset[0], asset[1], value/total))
@@ -72,7 +72,7 @@ class Portfolio:
 				self.assets.remove(ass)
 				self.assets.append((ass[0], ass[1] - 1, ass[2]))
 
-	def increment(self, asset):
+	def increment(self, asset): 
 		for ass in self.assets:
 			if (ass[0] == asset):
 				self.assets.remove(ass)
@@ -86,7 +86,7 @@ class Portfolio:
 		return max
 
 	def min(self, assetList):
-		min = (0, 0, 0)
+		min = (0, 0, 1)
 		for asset in assetList:
 			if (asset[2] < min[2]):
 				min = asset
@@ -109,17 +109,33 @@ class Portfolio:
 			less = nav[1]
 			print(nav)
 	
+# Test portfolio ponderation
+#pf = Portfolio()
+#pf.addAsset(933, 10)
+#pf.addAsset(666, 10)
+#pf.addAsset(944, 10)
+#pf.addAsset(951, 10)
+#pf.addAsset(1016, 10)
+#pf.addAsset(1007, 10)
+#pf.addAsset(995, 10)
+#pf.addAsset(1005, 10)
+#pf.addAsset(1021, 10)
+#pf.addAsset(949, 10)
+#pf.addAsset(996, 10)
+#pf.addAsset(1006, 10)
+#pf.addAsset(960, 10)
+#pf.addAsset(912, 10)
+#pf.addAsset(774, 10)
+#pf.addAsset(978, 10)
+#pf.addAsset(663, 10)
+#pf.addAsset(733, 10)
+#pf.addAsset(781, 10)
+#pf.addAsset(1001, 10)
+#pf.dump()
+#print(pf.getNAV())
+#pf.ponderate()
+#pf.dump()
 
-pf = Portfolio()
-pf.addAsset(933, 1)
-pf.addAsset(666, 10)
-pf.addAsset(944, 10)
-pf.addAsset(1001, 12)
-pf.dump()
-print(pf.getNAV())
-pf.ponderate()
-pf.dump()
-print(pf.getNAV())
 
 
 
