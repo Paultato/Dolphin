@@ -1,6 +1,5 @@
 import collections
 import json
-import threading
 import time
 import queue
 import multiprocessing
@@ -18,13 +17,18 @@ class CheckableQueue():  # or OrderedSetQueue
     res = False
     tmp = queue.Queue()
     #with self.source_queue.mutex:
-    while len(self.source_queue.queue):
-      e = self.source_queue.get_nowait()
-      if e == item:
-        res = True
-      tmp.put(e)
+    while True:
+      try:
+        e = self.source_queue.get()
+        self.source_queue.task_done()
+        if e == item:
+          res = True
+        tmp.put(e)
+      except queue.Empty:
+        break
     while not tmp.empty():
       self.source_queue.put(tmp.get())
+      self.source_queue.task_done()
     return res
 
 
@@ -93,13 +97,14 @@ class nodeAsset:
     for asset in tmp:
       maxSharpe = max(maxSharpe, asset.sharpe)
       # Elagage sharpe
-      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.18)) and (abs(portfolio.getCorrelation(asset.restId)) < 0.35):
+      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.2)) and (abs(portfolio.getCorrelation(asset.restId)) < 0.35):
         asset.parent = copySelf
         # Elagage unicité
         if (not pathList.count(createPath(asset, None))):
           copySelf.childrens.append(asset)
           if (path.count('-') + 1 == height) and (not pathList.count(path)):
             pathList.append(path)
+
         else:
           asset.parent = None
           #print("Elagage unicité")
@@ -111,8 +116,7 @@ class nodeAsset:
         if (path.count('-') + 1 == height) and (not pathList.count(path)):
           pathList.append(path)
     for children in copySelf.childrens:
-      if (path.count('-') + 1 < height) and (len(pathList) < 120):
-      # if (path.count('-') < height):
+      if (path.count('-') + 1 < height) and (len(pathList) < 3):
         children.sharpeTree(tmp, path, pathList, height)
 
   def sharpeTree2(self, assetList, path, pathList, height):
@@ -132,7 +136,8 @@ class nodeAsset:
         if (not createPath(asset, None) in CheckableQueue(pathList)):
           copySelf.childrens.append(asset)
           if (path.count('-') + 1 == height) and (not path in CheckableQueue(pathList)):
-            pathList.put_nowait(path)
+            pathList.put(path)
+            pathList.task_done()
         else:
           asset.parent = None
           #print("Elagage unicité")
@@ -142,7 +147,8 @@ class nodeAsset:
       if not copySelf.childrens:
         # print("path : " + path)
         if (path.count('-') + 1 == height) and (not pathList.count(path)):
-          pathList.put_nowait(path)
+            pathList.put(path)
+            pathList.task_done()
     for children in copySelf.childrens:
       if (path.count('-') + 1 < height):
         children.sharpeTree2(tmp, path, pathList, height)
@@ -163,10 +169,10 @@ if __name__ == "__main__":
   db.close()
 
   pathList = list()
-  threadPathList = queue.Queue()
+  # threadPathList = multiprocessing.Queue()
 
   start = time.time()
-  assetList[0].sharpeTree(assetList, "", pathList, 20)
+  assetList[0].sharpeTree(assetList, "", pathList, 3)
   end = time.time()
   print(end - start)
   print(len(pathList))
@@ -180,16 +186,17 @@ if __name__ == "__main__":
     addPortfolio(portfolio, assetString)
     portfolio.put()
     portfolio.computeSharpe()
-    portfolioList.append(portfolio, portfolio.getSharpe())
+    portfolioList.append((portfolio, portfolio.getSharpe()))
     print("Assets : ", assetString, ". Sharpe : ", portfolio.getSharpe())
   print(end - start)
   
-  sorted(portfolioList, key=lambda x: x[1])
+  portfolioList.sort(key=lambda tup: tup[1], reverse=True)
 
+  print("tot")
   # start = time.time()
   # jobs = []
-  # for i in range(5):
-  #   p = multiprocessing.Process(target=worker, args=(assetList[i], assetList, threadPathList, 3,))
+  # for i in range(1):
+  #   p = multiprocessing.Process(target=worker, args=(assetList[i], assetList, threadPathList, 3))
   #   p.start()
   #   jobs.append(p)
   # end = time.time()
