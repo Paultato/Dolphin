@@ -140,11 +140,8 @@ if __name__ == "__main__":
 	#pf.dump()
 	#print(pf.getNAV())
 	#pf.ponderate()
-	#pf.dump()
 	pf.dump()
-	#pf.computeValues()
-	#pf.dump()
-
+	
 
 
 

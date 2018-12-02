@@ -50,9 +50,11 @@ class CorrelationManager:
     def value(self, i, j):
         return self.dataframe[str(i)][j]
 
-cm = CorrelationManager()
-cm.build_csv()
-print(cm.dataframe)
-cm.build_df()
-#print(cm.dataframe)
-#print(cm.value(1001, 717))
+if __name__ == "__main__":
+
+    cm = CorrelationManager()
+    #cm.build_csv()
+    #print(cm.dataframe)
+    #cm.build_df()
+    #print(cm.dataframe)
+    #print(cm.value(1001, 717))
