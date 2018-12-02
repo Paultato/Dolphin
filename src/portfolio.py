@@ -47,9 +47,10 @@ class Portfolio:
 		self.assets.append((asset, quantity, 0)) 
 
 	def computeValues(self):
+		new = []
 		for a in self.assets:
-			self.assets.remove(a)
-			self.assets.append((a[0], a[0], Asset.getAssetValue(a[0])))
+			new.append((a[0], a[0], Asset.getAssetValue(a[0])))
+		self.assets = new
 
 	def dump(self):
 		for pair in self.assets:
@@ -140,6 +141,8 @@ if __name__ == "__main__":
 	#pf.dump()
 	#print(pf.getNAV())
 	#pf.ponderate()
+	pf.dump()
+	pf.computeValues()
 	pf.dump()
 	
 
