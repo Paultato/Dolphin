@@ -18,7 +18,7 @@ class CorrelationManager:
             self.assets.append(ass.rest_id)
     
     def body(self, id):
-        data = {"ratio" : [19], "asset" : self.assets, "benchmark" : id}
+        data = {"ratio" : [19], "asset" : self.assets, "benchmark" : id, "start_date": "2012-01-02", "end_date": "2018-08-31"}
         return data
     
     def get_corr(self, id):
@@ -50,9 +50,9 @@ class CorrelationManager:
     def value(self, i, j):
         return self.dataframe[str(i)][j]
 
-#cm = CorrelationManager()
-#cm.build_csv()
-#print(cm.dataframe)
-#cm.build_df()
+cm = CorrelationManager()
+cm.build_csv()
+print(cm.dataframe)
+cm.build_df()
 #print(cm.dataframe)
 #print(cm.value(1001, 717))
