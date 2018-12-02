@@ -11,12 +11,17 @@ class CorrelationManager:
     assets = []
     data = {}
     dataframe = None
+    db_assets = db.getAssets()
+    for ass in db_assets:
+        assets.append(ass.rest_id)
 
+    '''
     def __init__(self):
         db_assets = self.db.getAssets()
         for ass in db_assets:
             self.assets.append(ass.rest_id)
-    
+    '''
+
     def body(self, id):
         data = {"ratio" : [19], "asset" : self.assets, "benchmark" : id, "start_date": "2012-01-02", "end_date": "2018-08-31"}
         return data
