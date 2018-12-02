@@ -48,17 +48,31 @@ class Portfolio:
 		return tot / len(self.assets)
 
 	def addAsset(self, asset, quantity):
-		self.assets.append((asset, quantity, 0)) 
+		self.assets.append((asset, quantity, 0, '')) 
 
 	def computeValues(self):
 		new = []
 		for a in self.assets:
-			new.append((a[0], a[0], Asset.getAssetValue(a[0])))
+			new.append((a[0], a[1], Asset.getAssetValue(a[0])))
+		self.assets = new
+
+	def computeTypes(self):
+		new = []
+		for a in self.assets:
+			new.append((a[0], a[1], a[2], Asset.getAssetType(a[0])))
 		self.assets = new
 
 	def dump(self):
+		total = 0
+		qtt = 0
+		for asset in self.assets:
+			total += asset[1] * asset[2]
+			qtt += asset[1]
 		for pair in self.assets:
-			print(pair[0], ' : ', pair[1], ' -> ', pair[1] * pair[2])
+			print(pair[0], ' : ', pair[1], ' -> ', pair[1] * pair[2], " : ", pair[1] * pair[2] / total * 100, " type : ", pair[3])
+		print("Total : ", total)
+		print("Fund : ", self.getTypeRep())
+
 
 	def getNAV(self):
 		total = 0
@@ -76,17 +90,27 @@ class Portfolio:
 				less.append((asset[0], asset[1], value/total))
 		return (more, less)
 
+	def getTypeRep(self):
+		total = 0
+		totFund = 0
+		for a in self.assets:
+			total += a[1] * a[2]
+		for a in self.assets:
+			if (a[3] == 'FUND'):
+				totFund += a[1] * a[2]
+		return totFund / total * 100
+
 	def decrement(self, asset):
 		for ass in self.assets:
 			if (ass[0] == asset):
 				self.assets.remove(ass)
-				self.assets.append((ass[0], ass[1] - 1, ass[2]))
+				self.assets.append((ass[0], ass[1] - 1, ass[2], ass[3]))
 
 	def increment(self, asset): 
 		for ass in self.assets:
 			if (ass[0] == asset):
 				self.assets.remove(ass)
-				self.assets.append((ass[0], ass[1] + 1, ass[2]))
+				self.assets.append((ass[0], ass[1] + 1, ass[2], ass[3]))
 
 	def max(self, assetList):
 		max = (0, 0, 0)
@@ -107,10 +131,7 @@ class Portfolio:
 		more = nav[0]
 		less = nav[1]
 		while (len(more) > 0 or len(less) > 0):
-			if (len(more) > 0 and len(less) > 0):
-				self.decrement((self.max(more))[0])
-				self.increment((self.min(less))[0])
-			elif (len(more) > 0):
+			if (len(more) > 0):
 				self.decrement((self.max(more))[0])
 			elif (len(less) > 0):
 				self.increment((self.min(less))[0])
@@ -118,36 +139,49 @@ class Portfolio:
 			more = nav[0]
 			less = nav[1]
 			print(nav)
+		if (self.getTypeRep() > 50):
+			self.decrement(self.getHigherFund())
+			self.ponderate()
+
+	def getHigherFund(self):
+		high = (0, 0, 0, '')
+		for a in self.assets:
+			if (a[1] * a[2] > high[1] * high[2]):
+				high = a
+		return high[0]
 	
 if __name__ == "__main__":
 	# Test portfolio ponderation
 	pf = Portfolio()
-	pf.addAsset(933, 10)
-	pf.addAsset(666, 10)
-	pf.addAsset(944, 10)
-	pf.addAsset(951, 10)
-	#pf.addAsset(1016, 10)
-	#pf.addAsset(1007, 10)
-	#pf.addAsset(995, 10)
-	#pf.addAsset(1005, 10)
-	#pf.addAsset(1021, 10)
-	#pf.addAsset(949, 10)
-	#pf.addAsset(996, 10)
-	#pf.addAsset(1006, 10)
-	#pf.addAsset(960, 10)
-	#pf.addAsset(912, 10)
-	#pf.addAsset(774, 10)
-	#pf.addAsset(978, 10)
-	#pf.addAsset(663, 10)
-	#pf.addAsset(733, 10)
-	#pf.addAsset(781, 10)
-	#pf.addAsset(1001, 10)
-	#pf.dump()
-	#print(pf.getNAV())
-	#pf.ponderate()
-	pf.dump()
+	pf.addAsset(807, 100)
+	pf.addAsset(717, 100)
+	pf.addAsset(909, 100)
+	pf.addAsset(873, 100)
+	pf.addAsset(906, 100)
+	pf.addAsset(743, 100)
+	pf.addAsset(617, 100)
+	pf.addAsset(885, 100)
+	pf.addAsset(687, 100)
+	pf.addAsset(1002, 100)
+	pf.addAsset(792, 100)
+	pf.addAsset(705, 100)
+	pf.addAsset(813, 100)
+	pf.addAsset(993, 100)
+	pf.addAsset(877, 100)
+	pf.addAsset(753, 100)
+	pf.addAsset(686, 100)
+	pf.addAsset(960, 100)
+	pf.addAsset(944, 100)
+	pf.addAsset(883, 100)
 	pf.computeValues()
+	pf.computeTypes()
+	pf.ponderate()
 	pf.dump()
+	pf.put()
+	pf.computeSharpe()
+
+	print(pf.getSharpe())
+	
 	
 
 
