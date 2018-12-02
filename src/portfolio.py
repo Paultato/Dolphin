@@ -13,6 +13,9 @@ class Portfolio:
 	typef = "front"
 	date = "2012-01-02"
 
+	def __init__(self):
+		self.assets = []
+
 	def buildJson(self):
 		assetList = []
 		for pair in self.assets:
