@@ -8,7 +8,7 @@ class dbManager:
     connection = None
 
     def __init__(self):
-        engine = create_engine('sqlite:///database.sqlite', echo=True)
+        engine = create_engine('sqlite:///database.sqlite')
         self.connection = engine.connect()
         Session = sessionmaker(bind=engine)
         Session.configure(bind=engine)

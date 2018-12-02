@@ -31,7 +31,6 @@ class CheckableQueue():  # or OrderedSetQueue
       self.source_queue.task_done()
     return res
 
-
 def createPath(node, oldPath):
   path = list()
   if oldPath:
@@ -104,19 +103,14 @@ class nodeAsset:
           copySelf.childrens.append(asset)
           if (path.count('-') + 1 == height) and (not pathList.count(path)):
             pathList.append(path)
-
         else:
           asset.parent = None
-          #print("Elagage unicité")
           continue
-      # else:
-        # print("Elagage sharpe | max children reach")
       if not copySelf.childrens:
-        # print("path : " + path)
         if (path.count('-') + 1 == height) and (not pathList.count(path)):
           pathList.append(path)
     for children in copySelf.childrens:
-      if (path.count('-') + 1 < height) and (len(pathList) < 300):
+      if (path.count('-') + 1 < height) and (len(pathList) < 120):
         children.sharpeTree(tmp, path, pathList, height)
 
   def sharpeTree2(self, assetList, path, pathList, height):
@@ -181,13 +175,17 @@ if __name__ == "__main__":
 
   portfolioList = []
   maxSharpe = 0
+  i = 0
   for assetString in pathList:
     portfolio = Portfolio()
     addPortfolio(portfolio, assetString)
+    portfolio.fill()
+    portfolio.ponderate()
     portfolio.put()
     portfolio.computeSharpe()
     portfolioList.append((portfolio, portfolio.getSharpe()))
-    print("Assets : ", assetString, ". Sharpe : ", portfolio.getSharpe())
+    print("Portefeuille : ", i, "Assets : ", assetString, ". Sharpe : ", portfolio.getSharpe())
+    i += 1
   print(end - start)
   
   portfolioList.sort(key=lambda tup: tup[1], reverse=True)
@@ -195,7 +193,13 @@ if __name__ == "__main__":
   for i in range(5):
     print("Sharpe : ", portfolioList[i][1])
 
-  print("tot")
+  portfolioList[0][0].put()
+
+  file = open("result.txt", "w")
+  file.write(portfolioList[0][0].buildJson())
+  file.write("\n")
+  file.close()
+
   # start = time.time()
   # jobs = []
   # for i in range(1):

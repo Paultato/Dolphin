@@ -73,6 +73,9 @@ class Portfolio:
 		print("Total : ", total)
 		print("Fund : ", self.getTypeRep())
 
+	def fill(self):
+		self.computeValues()
+		self.computeTypes()
 
 	def getNAV(self):
 		total = 0
@@ -81,7 +84,7 @@ class Portfolio:
 		for asset in self.assets:
 			total += asset[1] * asset[2]
 		for asset in self.assets:
-			sup = total / 10
+			sup = total / 100 * 9
 			und = total / 100
 			value = asset[1] * asset[2]
 			if (value > sup):
@@ -138,7 +141,6 @@ class Portfolio:
 			nav = self.getNAV()
 			more = nav[0]
 			less = nav[1]
-			print(nav)
 		if (self.getTypeRep() > 50):
 			self.decrement(self.getHigherFund())
 			self.ponderate()
