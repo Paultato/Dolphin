@@ -3,12 +3,6 @@ from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
  
-engine = create_engine('sqlite:///database.sqlite', echo=True)
-connection = engine.connect()
-if not database_exists(engine.url):
-    create_database(engine.url)
-print("Database Existing: ", database_exists(engine.url))
- 
 Base = declarative_base()
  
 class Currency(Base):
@@ -34,14 +28,21 @@ class Asset(Base):
     def __repr__(self):
         return "<Asset(REST ID='%d', Close Value='%d', Close Value Decimal='%d', Type='%s', Sharpe='%f')>" % (self.rest_id, self.close_value, self.close_value_decimal, self.asset_type, self.sharpe)
  
-
-Currency.__table__
-Asset.__table__
-Base.metadata.create_all(engine)
- 
-Session = sessionmaker(bind=engine)
-Session.configure(bind=engine)
-session = Session()
-session.commit()
- 
-connection.close()
+if __name__ == "__main__":
+    engine = create_engine('sqlite:///database.sqlite', echo=True)
+    connection = engine.connect()
+    if not database_exists(engine.url):
+        create_database(engine.url)
+    print("Database Existing: ", database_exists(engine.url))
+     
+    
+    Currency.__table__
+    Asset.__table__
+    Base.metadata.create_all(engine)
+     
+    Session = sessionmaker(bind=engine)
+    Session.configure(bind=engine)
+    session = Session()
+    session.commit()
+     
+    connection.close()

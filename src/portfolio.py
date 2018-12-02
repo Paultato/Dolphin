@@ -44,7 +44,12 @@ class Portfolio:
 		return tot / len(self.assets)
 
 	def addAsset(self, asset, quantity):
-		self.assets.append((asset, quantity, Asset.getAssetValue(asset))) 
+		self.assets.append((asset, quantity, 0)) 
+
+	def computeValues(self):
+		for a in self.assets:
+			self.assets.remove(a)
+			self.assets.append((a[0], a[0], Asset.getAssetValue(a[0])))
 
 	def dump(self):
 		for pair in self.assets:
@@ -109,32 +114,36 @@ class Portfolio:
 			less = nav[1]
 			print(nav)
 	
-# Test portfolio ponderation
-#pf = Portfolio()
-#pf.addAsset(933, 10)
-#pf.addAsset(666, 10)
-#pf.addAsset(944, 10)
-#pf.addAsset(951, 10)
-#pf.addAsset(1016, 10)
-#pf.addAsset(1007, 10)
-#pf.addAsset(995, 10)
-#pf.addAsset(1005, 10)
-#pf.addAsset(1021, 10)
-#pf.addAsset(949, 10)
-#pf.addAsset(996, 10)
-#pf.addAsset(1006, 10)
-#pf.addAsset(960, 10)
-#pf.addAsset(912, 10)
-#pf.addAsset(774, 10)
-#pf.addAsset(978, 10)
-#pf.addAsset(663, 10)
-#pf.addAsset(733, 10)
-#pf.addAsset(781, 10)
-#pf.addAsset(1001, 10)
-#pf.dump()
-#print(pf.getNAV())
-#pf.ponderate()
-#pf.dump()
+if __name__ == "__main__":
+	# Test portfolio ponderation
+	pf = Portfolio()
+	pf.addAsset(933, 10)
+	pf.addAsset(666, 10)
+	pf.addAsset(944, 10)
+	pf.addAsset(951, 10)
+	#pf.addAsset(1016, 10)
+	#pf.addAsset(1007, 10)
+	#pf.addAsset(995, 10)
+	#pf.addAsset(1005, 10)
+	#pf.addAsset(1021, 10)
+	#pf.addAsset(949, 10)
+	#pf.addAsset(996, 10)
+	#pf.addAsset(1006, 10)
+	#pf.addAsset(960, 10)
+	#pf.addAsset(912, 10)
+	#pf.addAsset(774, 10)
+	#pf.addAsset(978, 10)
+	#pf.addAsset(663, 10)
+	#pf.addAsset(733, 10)
+	#pf.addAsset(781, 10)
+	#pf.addAsset(1001, 10)
+	#pf.dump()
+	#print(pf.getNAV())
+	#pf.ponderate()
+	#pf.dump()
+	pf.dump()
+	#pf.computeValues()
+	#pf.dump()
 
 
 

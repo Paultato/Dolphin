@@ -43,5 +43,3 @@ def getAssetValue(assetId):
 	db = dbManager()
 	ass = db.getAsset(assetId)
 	return ass.close_value + (ass.close_value_decimal / 1000000000000) - 1
-
-getAssets()
