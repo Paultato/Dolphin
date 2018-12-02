@@ -49,7 +49,7 @@ def createPath(node, oldPath):
 def addPortfolio(portfolio, assetString):
   assetList = assetString.split('-')
   for asset in assetList:
-    portfolio.addAsset(asset, 10)
+    portfolio.addAsset(asset, 100)
 
 class nodeAsset:
   def __init__(self, restId, closeValue, type, sharpe):
@@ -76,6 +76,16 @@ class nodeAsset:
     path = createPath(self, None)
     portfolio = Portfolio()
     addPortfolio(portfolio, path)
+
+# REMOVE ME
+    toto = self
+    prof = 0
+    while toto :
+      prof = prof + 1
+      toto = toto.parent
+    print(prof)
+###########
+
     tmp = list()
     for a in assetList:
       if not (a == self):
@@ -83,7 +93,7 @@ class nodeAsset:
     for asset in tmp:
       maxSharpe = max(maxSharpe, asset.sharpe)
       # Elagage sharpe
-      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.2)) and (abs(portfolio.getCorrelation(asset.restId)) < 0.2):
+      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.18)) and (abs(portfolio.getCorrelation(asset.restId)) < 0.35):
         asset.parent = copySelf
         # Elagage unicité
         if (not pathList.count(createPath(asset, None))):
@@ -101,8 +111,8 @@ class nodeAsset:
         if (path.count('-') + 1 == height) and (not pathList.count(path)):
           pathList.append(path)
     for children in copySelf.childrens:
-      # if (path.count('-') + 1 < height) and (len(pathList) < 30):
-      if (path.count('-') + 1 < height):
+      if (path.count('-') + 1 < height) and (len(pathList) < 120):
+      # if (path.count('-') < height):
         children.sharpeTree(tmp, path, pathList, height)
 
   def sharpeTree2(self, assetList, path, pathList, height):
@@ -145,7 +155,7 @@ if __name__ == "__main__":
 
   assetList = list()
   db = dbManager()
-  query = db.getAssets().order_by(desc('sharpe')).limit(10).all()
+  query = db.getAssets().order_by(desc('sharpe')).all()
   for asset in query:
     tmp = nodeAsset(asset.rest_id, asset.close_value + (asset.close_value_decimal / 1000000000000) - 1,
                     asset.asset_type, asset.sharpe)
@@ -156,18 +166,26 @@ if __name__ == "__main__":
   threadPathList = queue.Queue()
 
   start = time.time()
-  assetList[0].sharpeTree(assetList, "", pathList, 4)
+  assetList[0].sharpeTree(assetList, "", pathList, 20)
   end = time.time()
+  print(end - start)
+  print(len(pathList))
 
+  start = time.time()
+
+  portfolioList = []
+  maxSharpe = 0
   for assetString in pathList:
     portfolio = Portfolio()
     addPortfolio(portfolio, assetString)
     portfolio.put()
     portfolio.computeSharpe()
-    print(portfolio.getSharpe())
-
-  # print(end - start)
+    portfolioList.append(portfolio, portfolio.getSharpe())
+    print("Assets : ", assetString, ". Sharpe : ", portfolio.getSharpe())
+  print(end - start)
   
+  sorted(portfolioList, key=lambda x: x[1])
+
   # start = time.time()
   # jobs = []
   # for i in range(5):
