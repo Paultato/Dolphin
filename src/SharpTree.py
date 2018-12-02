@@ -97,7 +97,7 @@ class nodeAsset:
     for asset in tmp:
       maxSharpe = max(maxSharpe, asset.sharpe)
       # Elagage sharpe
-      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.2)) and (abs(portfolio.getCorrelation(asset.restId)) < 0.35):
+      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.18)) and (abs(portfolio.getCorrelation(asset.restId)) < 0.35):
         asset.parent = copySelf
         # Elagage unicité
         if (not pathList.count(createPath(asset, None))):
@@ -116,7 +116,7 @@ class nodeAsset:
         if (path.count('-') + 1 == height) and (not pathList.count(path)):
           pathList.append(path)
     for children in copySelf.childrens:
-      if (path.count('-') + 1 < height) and (len(pathList) < 3):
+      if (path.count('-') + 1 < height) and (len(pathList) < 300):
         children.sharpeTree(tmp, path, pathList, height)
 
   def sharpeTree2(self, assetList, path, pathList, height):
@@ -172,7 +172,7 @@ if __name__ == "__main__":
   # threadPathList = multiprocessing.Queue()
 
   start = time.time()
-  assetList[0].sharpeTree(assetList, "", pathList, 3)
+  assetList[0].sharpeTree(assetList, "", pathList, 20)
   end = time.time()
   print(end - start)
   print(len(pathList))
@@ -191,6 +191,9 @@ if __name__ == "__main__":
   print(end - start)
   
   portfolioList.sort(key=lambda tup: tup[1], reverse=True)
+
+  for i in range(5):
+    print("Sharpe : ", portfolioList[i][1])
 
   print("tot")
   # start = time.time()
