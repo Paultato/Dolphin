@@ -5,6 +5,7 @@ import time
 import queue
 import multiprocessing
 
+from portfolio import *
 from dbManager import dbManager
 from sqlalchemy import desc
 from decimal import Decimal
@@ -45,6 +46,11 @@ def createPath(node, oldPath):
     res += '-' + path.pop()
   return res
 
+def addPortfolio(portfolio, assetString):
+  assetList = assetString.split('-')
+  for asset in assetList:
+    portfolio.addAsset(asset, 10)
+
 class nodeAsset:
   def __init__(self, restId, closeValue, type, sharpe):
     self.restId = restId
@@ -67,8 +73,9 @@ class nodeAsset:
   def sharpeTree(self, assetList, path, pathList, height):
     maxSharpe = Decimal(0.0)
     copySelf = self.deepCopy()
-    
     path = createPath(self, None)
+    portfolio = Portfolio()
+    addPortfolio(portfolio, path)
     tmp = list()
     for a in assetList:
       if not (a == self):
@@ -76,7 +83,7 @@ class nodeAsset:
     for asset in tmp:
       maxSharpe = max(maxSharpe, asset.sharpe)
       # Elagage sharpe
-      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.2)):
+      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.2) and (len(asset.children) < 3)):
         asset.parent = copySelf
         # Elagage unicité
         if (not pathList.count(createPath(asset, None))):
@@ -88,7 +95,7 @@ class nodeAsset:
           #print("Elagage unicité")
           continue
       # else:
-        # print("Elagage sharpe")
+        # print("Elagage sharpe | max children reach")
       if not copySelf.childrens:
         # print("path : " + path)
         if (path.count('-') + 1 == height) and (not pathList.count(path)):
