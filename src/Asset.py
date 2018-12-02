@@ -33,7 +33,7 @@ def getPrice(price_str, changeRate, currency):
 	return price
 
 def getSharpe(assetId):
-	data = {"ratio": [20], "asset": [assetId]}
+	data = {"ratio": [20], "asset": [assetId], "start_date": "2012-01-02", "end_date": "2018-08-31"}
 	api = RestManager()
 	response = api.post("ratio/invoke", data)
 	res = json.loads(response)
@@ -43,3 +43,5 @@ def getAssetValue(assetId):
 	db = dbManager()
 	ass = db.getAsset(assetId)
 	return ass.close_value + (ass.close_value_decimal / 1000000000000) - 1
+
+getAssets()
