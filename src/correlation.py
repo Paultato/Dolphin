@@ -53,7 +53,7 @@ class CorrelationManager:
         self.dataframe = df
 
     def value(self, i, j):
-        return self.dataframe[str(i)][j]
+        return self.dataframe[str(i)][int(j)]
 
 if __name__ == "__main__":
 
