@@ -5,7 +5,7 @@ import time
 import queue
 import multiprocessing
 
-# from portfolio import *
+from portfolio import *
 from dbManager import dbManager
 from sqlalchemy import desc
 from decimal import Decimal
@@ -74,8 +74,8 @@ class nodeAsset:
     maxSharpe = Decimal(0.0)
     copySelf = self.deepCopy()
     path = createPath(self, None)
-    # portfolio = Portfolio()
-    # addPortfolio(portfolio, path)
+    portfolio = Portfolio()
+    addPortfolio(portfolio, path)
     tmp = list()
     for a in assetList:
       if not (a == self):
@@ -83,7 +83,7 @@ class nodeAsset:
     for asset in tmp:
       maxSharpe = max(maxSharpe, asset.sharpe)
       # Elagage sharpe
-      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.2)):
+      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.2)) and (abs(portfolio.getCorrelation(asset.restId)) < 0.2):
         asset.parent = copySelf
         # Elagage unicité
         if (not pathList.count(createPath(asset, None))):
@@ -101,7 +101,8 @@ class nodeAsset:
         if (path.count('-') + 1 == height) and (not pathList.count(path)):
           pathList.append(path)
     for children in copySelf.childrens:
-      if (path.count('-') + 1 < height) and (len(pathList) < 30):
+      # if (path.count('-') + 1 < height) and (len(pathList) < 30):
+      if (path.count('-') + 1 < height):
         children.sharpeTree(tmp, path, pathList, height)
 
   def sharpeTree2(self, assetList, path, pathList, height):
@@ -131,7 +132,7 @@ class nodeAsset:
       if not copySelf.childrens:
         # print("path : " + path)
         if (path.count('-') + 1 == height) and (not pathList.count(path)):
-          pathList.append(path)
+          pathList.put_nowait(path)
     for children in copySelf.childrens:
       if (path.count('-') + 1 < height):
         children.sharpeTree2(tmp, path, pathList, height)
@@ -157,23 +158,30 @@ if __name__ == "__main__":
   start = time.time()
   assetList[0].sharpeTree(assetList, "", pathList, 4)
   end = time.time()
-  print(end - start)
+
+  for assetString in pathList:
+    portfolio = Portfolio()
+    addPortfolio(portfolio, assetString)
+    portfolio.put()
+    portfolio.computeSharpe()
+    print(portfolio.getSharpe())
+
+  # print(end - start)
   
-  start = time.time()
-  jobs = []
+  # start = time.time()
+  # jobs = []
   # for i in range(5):
   #   p = multiprocessing.Process(target=worker, args=(assetList[i], assetList, threadPathList, 3,))
   #   p.start()
   #   jobs.append(p)
+  # end = time.time()
+  # print(end - start)
 
-  end = time.time()
-  print(end - start)
-
-i = 0
-threadPathList.put("toto")
-print(threadPathList.empty())
-while not threadPathList.empty():
-  a = threadPathList.get()
-  print(a)
-  print(threadPathList.empty())
-print("out")
+  # i = 0
+  # threadPathList.put("toto")
+  # print(threadPathList.empty())
+  # while not threadPathList.empty():
+  #   a = threadPathList.get()
+  #   print(a)
+  #   print(threadPathList.empty())
+  # print("out")

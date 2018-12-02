@@ -29,10 +29,11 @@ class Portfolio:
 
 	def computeSharpe(self):
 		api = RestManager()
-		body = {"ratio": [20], "asset": [1034]}
+		body = {"ratio": [20], "asset": [1034],
+                    "start_date": "2012-01-02", "end_date": "2018-08-31"}
 		response = api.post('ratio/invoke', body)
 		res = json.loads(response)
-		self.sarpe = res["1034"]["20"]["value"]
+		self.sharpe = res["1034"]["20"]["value"]
 
 	def getSharpe(self):
 		return self.sharpe
