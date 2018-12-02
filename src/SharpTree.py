@@ -3,6 +3,7 @@ import json
 import time
 import queue
 import multiprocessing
+import sys
 
 from portfolio import *
 from dbManager import dbManager
@@ -73,21 +74,12 @@ class nodeAsset:
     tmp.childrens = list()
     return tmp
 
-  def sharpeTree(self, assetList, path, pathList, height):
+  def sharpeTree(self, assetList, path, pathList, height, magikNumber):
     maxSharpe = Decimal(0.0)
     copySelf = self.deepCopy()
     path = createPath(self, None)
     portfolio = Portfolio()
     addPortfolio(portfolio, path)
-
-# REMOVE ME
-    toto = self
-    prof = 0
-    while toto :
-      prof = prof + 1
-      toto = toto.parent
-    print(prof)
-###########
 
     tmp = list()
     for a in assetList:
@@ -96,7 +88,7 @@ class nodeAsset:
     for asset in tmp:
       maxSharpe = max(maxSharpe, asset.sharpe)
       # Elagage sharpe
-      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(1.18)) and (abs(portfolio.getCorrelation(asset.restId)) < 0.35):
+      if (Decimal(asset.sharpe) > Decimal(maxSharpe) / Decimal(magikNumber)) and (abs(portfolio.getCorrelation(asset.restId)) < 0.35):
         asset.parent = copySelf
         # Elagage unicité
         if (not pathList.count(createPath(asset, None))):
@@ -111,7 +103,7 @@ class nodeAsset:
           pathList.append(path)
     for children in copySelf.childrens:
       if (path.count('-') + 1 < height) and (len(pathList) < 120):
-        children.sharpeTree(tmp, path, pathList, height)
+        children.sharpeTree(tmp, path, pathList, height, magikNumber)
 
   def sharpeTree2(self, assetList, path, pathList, height):
     maxSharpe = Decimal(0.0)
@@ -147,9 +139,9 @@ class nodeAsset:
       if (path.count('-') + 1 < height):
         children.sharpeTree2(tmp, path, pathList, height)
 
-def worker(a, assetList, threadpathList, height):
-  a.sharpeTree2(assetList, "", threadPathList, height)
-  print(threadpathList)
+# def worker(a, assetList, threadpathList, height):
+#   a.sharpeTree2(assetList, "", threadPathList, height)
+#   print(threadpathList)
 
 if __name__ == "__main__":
 
@@ -166,7 +158,7 @@ if __name__ == "__main__":
   # threadPathList = multiprocessing.Queue()
 
   start = time.time()
-  assetList[0].sharpeTree(assetList, "", pathList, 20)
+  assetList[0].sharpeTree(assetList, "", pathList, 20, sys.argv[1])
   end = time.time()
   print(end - start)
   print(len(pathList))
@@ -190,13 +182,13 @@ if __name__ == "__main__":
   
   portfolioList.sort(key=lambda tup: tup[1], reverse=True)
 
-  for i in range(5):
+  for i in range(1):
     print("Sharpe : ", portfolioList[i][1])
 
   portfolioList[0][0].put()
 
-  file = open("result.txt", "w")
-  file.write(portfolioList[0][0].buildJson())
+  file = open("result.txt", "a")
+  file.write(portfolioList[0][0].toString() + " | Sharpe : " + str(portfolioList[0][1]))
   file.write("\n")
   file.close()
 

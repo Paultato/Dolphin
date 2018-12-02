@@ -22,6 +22,13 @@ class Portfolio:
 			assetList.append({'asset': {'asset': pair[0], 'quantity': pair[1]}})
 		return {'currency': {'code': self.code}, 'label': self.label, 'type': self.typef, 'values': {self.date: assetList}}
 
+	def toString(self):
+		assetList = []
+		for pair in self.assets:
+			assetList.append({'asset': {'asset': pair[0], 'quantity': pair[1]}})
+		return "{'currency': {'code': " + self.code + "}, 'label': " + self.label + ", 'type': " + self.typef + ", 'values': {" + self.date + " : " + str(assetList) + "} }\n"
+
+
 	def put(self):
 		api = RestManager()
 		body = self.buildJson()
