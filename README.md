@@ -13,6 +13,6 @@ Pour ajouter des paquets pip au projet, installer avec pip les paquets puis ajou
 ## Technologies utilisées
 
 * python3
-* pip3
 * SQLite
 * SQLAlchemy
+* Pandas
