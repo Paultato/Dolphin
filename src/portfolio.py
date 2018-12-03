@@ -28,7 +28,6 @@ class Portfolio:
 			assetList.append({'asset': {'asset': pair[0], 'quantity': pair[1]}})
 		return "{'currency': {'code': " + self.code + "}, 'label': " + self.label + ", 'type': " + self.typef + ", 'values': {" + self.date + " : " + str(assetList) + "} }\n"
 
-
 	def put(self):
 		api = RestManager()
 		body = self.buildJson()
@@ -76,8 +75,12 @@ class Portfolio:
 			total += asset[1] * asset[2]
 			qtt += asset[1]
 		for pair in self.assets:
-			print(pair[0], ' : ', pair[1], ' -> ', pair[1] * pair[2], " : ", pair[1] * pair[2] / total * 100, " type : ", pair[3])
-		print("Total : ", total)
+			if (pair[0] >= 1000 and pair[1] >= 100):
+				print(pair[0], ' : ', pair[1], ' -> ', pair[1] * pair[2] / total * 100)
+			elif ((pair[0] >= 100 and pair[1] >= 100) or (pair[0] >= 1000 and pair[1] < 100)):
+				print(pair[0], ' : ', pair[1], '  -> ', pair[1] * pair[2] / total * 100)
+			else:
+				print(pair[0], ' : ', pair[1], '   -> ', pair[1] * pair[2] / total * 100)
 		print("Fund : ", self.getTypeRep())
 
 	def fill(self):
@@ -162,34 +165,31 @@ class Portfolio:
 if __name__ == "__main__":
 	# Test portfolio ponderation
 	pf = Portfolio()
-	pf.addAsset(807, 100)
-	pf.addAsset(717, 100)
-	pf.addAsset(909, 100)
-	pf.addAsset(873, 100)
-	pf.addAsset(906, 100)
-	pf.addAsset(743, 100)
+	pf.addAsset(1001, 15)
+	pf.addAsset(1002, 46)
 	pf.addAsset(617, 100)
-	pf.addAsset(885, 100)
-	pf.addAsset(687, 100)
-	pf.addAsset(1002, 100)
-	pf.addAsset(792, 100)
-	pf.addAsset(705, 100)
-	pf.addAsset(813, 100)
-	pf.addAsset(993, 100)
-	pf.addAsset(877, 100)
+	pf.addAsset(686, 80)
+	pf.addAsset(687, 270)
+	pf.addAsset(705, 64)
+	pf.addAsset(717, 930)
+	pf.addAsset(743, 250)
 	pf.addAsset(753, 100)
-	pf.addAsset(686, 100)
-	pf.addAsset(960, 100)
-	pf.addAsset(944, 100)
-	pf.addAsset(883, 100)
-	pf.computeValues()
-	pf.computeTypes()
-	pf.ponderate()
+	pf.addAsset(792, 100)
+	pf.addAsset(807, 340)
+	pf.addAsset(813, 100)
+	pf.addAsset(873, 200)
+	pf.addAsset(877, 100)
+	pf.addAsset(883, 55)
+	pf.addAsset(885, 250)
+	pf.addAsset(906, 340)
+	pf.addAsset(909, 350)
+	pf.addAsset(912, 67)
+	pf.addAsset(960, 42)
+	pf.fill()
 	pf.dump()
 	pf.put()
 	pf.computeSharpe()
-
-	print(pf.getSharpe())
+	print("Sharpe : ", pf.getSharpe())
 	
 	
 
